@@ -1,0 +1,141 @@
+---
+title: "Cadena de MArkov"
+author: "Guillermo Durán González"
+format: pptx
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cadenas de Markov
+
+**Ejemplo A:** 
+
+Consideremos un modelo de enfermedad con tres estadios.
+
+-   La etapa 1 es saludable, la etapa 2 es la enfermedad leve, y la etapa 3 es la enfermedad grave.
+
+-   Los individuos sanos permanecen sanos con una probabilidad de 0,99 y desarrollan una enfermedad leve con una probabilidad 0.01.
+
+-   Los individuos con enfermedad leve se curan y se convierten en sanos con probabilidad 0,5, permanecen con enfermedad leve con probabilidad 0,4, y progresan a la enfermedad grave con una probabilidad de 0,1.
+
+-   Por último, los que tienen una enfermedad grave permanecen en ese estado con probabilidad 0,75, y mejoran a enfermedad leve con probabilidad 0,25.
+
+## Esto describe una cadena de Markov con tres estados:
+
+![Diagrama de Estados](Diagrama%20de%20estados.jpg){fig-alt="Diagrama" fig-align="center" width="369"}
+
+Que corresponde a la matríz $P$:
+
+$$
+P=\left[\begin{array}{lll}
+0.99 & 0.01 & 0.00 \\
+0.50 & 0.40 & 0.10 \\
+0.00 & 0.25 & 0.75
+\end{array}\right]
+$$
+## Y ahora 
+
+Simulando dos individuos durante 10000 pasos, uno que comienza sano y otro que comienza con una enfermedad grave:
+
+**1.  Parte saludable:**
+
+```{r remedy001}
+#instancia la matriz P
+P <- matrix(c( 0.99, 0.01, 0.0, 0.5, 0.4, 0.1, 0.0, 0.25, 0.75), 3, 3, byrow = TRUE) 
+#reserva memoria para 10000 estados
+healthy <- numeric(10000)
+#inicializa en estado saludable
+healthy[1] <- 1
+#Pasa por 10000 momentos
+for (t in 1:9999)
+healthy[t + 1] <- sample(1:3, size = 1, prob = P[healthy[t], ])
+# Frecuencias
+table(healthy)
+```
+**¿Cómo será partiendo del estado grave?**
+
+## 2.  Parte grave
+
+```{r remedy002}
+#Reserva memoria 
+sick <- numeric(10000)
+#Inicializa el estado grave
+sick[1] <- 3
+#Pasa por 10000 momentos
+for (t in 1:9999)
+sick[t + 1] <- sample(1:3, size = 1, prob = P[sick[t], ])
+# Frecuencias
+table(sick)
+
+```
+
+## Ejemplo B
+
+Al arrendar camiones de mudanzas necesita aplicar un cargo por traslado para cubrir el costo de enviar camiones desde áreas en las que hay sobrantes a otros lugares en los que se necesitan. 
+
+## Para esto:
+
+-   Se desea determinar la proporción del número total de camiones que, a largo plazo, acabaran en cada una de las áreas de arriendo.
+
+-   Si las proporciones son aproximadamente las mismas, el cargo por traslado será innecesario. Si no es así, el cargo dependerá de la proporción del total que termine en cada región.
+
+-   Hay 3 regiones: Norte, Centro y Sur.
+
+## La proporción de camiones que se regresan a cada región de un mes a otro se muestra en la siguiente tabla:
+
+$$
+\begin{array}{|l|c|c|c|}
+\hline \text { Región } & \text { Norte } & \text { Centro } & \text { Sur } \\
+\hline \text { Norte } & 0,2 & 0,3 & 0,5 \\
+\hline \text { Centro } & 0,3 & 0,4 & 0,3 \\
+\hline \text { Sur } & 0,2 & 0,4 & 0,4 \\
+\hline
+\end{array}
+$$
+
+## Dado el patrón de movimiento de los camiones, la empresa está interesada en saber lo siguiente:
+
+1.  Un gráfico de la situación, indicando los estados posibles.
+
+2.  ¿Qué proporción de los camiones se encontrará en cada región después de un mes? ¿Después de dos meses?
+
+3.  Dado que este mes, el 40% de los camiones se encuentra en el norte, 30% en la parte central y 30% están en la región del sur ¿Cuál es el porcentaje de camiones que se encontrara en cada región después de dos meses?
+
+## Gráfico
+
+```{r remedy003}
+library(markovchain)
+
+mm <- matrix(c(0.2,0.3,0.5,0.3,0.4,0.3,0.2,0.4,0.4),nrow = 3,
+byrow = TRUE) #define la matriz de transición
+mt <- new("markovchain",transitionMatrix=mm,
+states=c('Norte','Centro','Sur'),
+name="Matriz de transición") #crea la matriz 
+plot(mt)
+
+```
+
+## Desplazamiento de los camiones:
+
+```{r remedy004}
+#Cálculo segundo mes
+P2<-mt^2
+#Proporción de camiones en el mes 2
+P2
+```
+## Predicción
+
+Dado que este mes, el 40% de los camiones se encuentra en el norte, 30% en la parte central y 30% están en la región del sur ¿Cuál es el porcentaje de camiones que se encontrara en cada región después de dos meses?
+
+```{r remedy005}
+
+#Condición actual
+P <- c(0.4,0.3,0.3)
+#Multiplicación del vector inicial por la matriz del segundo mes
+z <- P*P2
+#Visualiza la proporción de camiones por región en el segundo mes considerando un vector inicial
+z
+```

@@ -1,0 +1,102 @@
+---
+title: "Monte Carlo Integración"
+author: "Guillermo Durán González"
+format: pptx
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Monte Carlo Integración
+
+Sea g(x) una función integrable en \[a,b\], el área de la región con $a < x < b$ y entre $0$ y $g(x)$ (donde los valores negativos cuentan como áreas negativas), esta dada por:
+
+$$
+\int_a^b g(x) dx
+$$
+
+## La integración de Monte Carlo usa la simulación para obtener aproximaciones a estas integrales.
+
+Se basa en la ley de los grandes números. Esta ley dice que una media muestral de una gran muestra aleatoria tenderá a acercarse al valor esperado de la distribución muestreada.
+
+Si podemos expresar una integral como un valor esperado, podemos aproximarla mediante una media muestral.
+
+## Por ejemplo
+
+Sean $U_1,U_2,...,U_n$ variables aleatorias uniformes independientes en el intervalo \[a,b\]. Estas tienen una densidad $f(u) = 1/(b - a)$ en ese intervalo.
+
+$$
+E\left[g\left(U_i\right)\right]=\int_a^b g(u) \frac{1}{b-a} d u
+$$
+
+## Ejemplo
+
+Podemos aproximar la siguiente integral:
+
+$$
+\int_0^1 x^4 dx
+$$
+
+```{r remedy001}
+
+u <- runif(100000)
+mean(u^4)
+## [1] 0.2005908
+
+```
+
+## Integración Multiple
+
+$V_1,V_2,...,V_n$ sea un conjunto adicional de variables aleatorias uniformes independientes en el intervalo $[0,1]$, y supongamos que $g(x,y)$ es ahora una función integrable de las dos variables $x$ e $y$. La ley de los grandes números dice que:
+
+$$
+\lim _{n \rightarrow \infty} \sum_{i=1}^n g\left(U_i, V_i\right) / n=\int_0^1 \int_0^1 g(x, y) d x d y
+$$
+
+## Así que podemos aproximar la integral:
+
+$$\int_0^1 \int_0^1 g(x, y) d x d y$$
+
+generando dos conjuntos de variantes pseudoaleatorias uniformes e independientes, calculando $g(U_i,V_i)$ para cada una, y tomando la media.
+
+## Ejemplo
+
+Consideremos:
+
+$$\int_3^5 \int_1^7 sen(x-y) d x d y$$
+
+## Su aproximación equivale a:
+
+```{r remedy002}
+
+U <- runif(100000, min = 1, max = 7)
+V <- runif(100000, min = 3, max = 5)
+mean(sin(U - V))*12
+## [1] 0.03835933
+
+```
+
+## Un ejemplo no tan sencillo:
+
+$$
+\int_0^{\infty} \exp \left[-(x+1)^2\right] d x
+$$ \
+
+## Consideraciones
+
+La densidad uniforme no es la única densidad que puede utilizarse en integración de Monte Carlo. Si la densidad de X es f(x), entonces $E[g(X)/f(X)] = [g(x)/f(x)]f(x)dx = g(x)dx$ por lo que podemos aproximar esta última mediante promedios muestrales de $g(X)/f(X)$.
+
+```{r remedy003}
+
+X <- rexp(100000)
+mean( exp( -(X + 1)^2 ) / dexp(X) )
+
+## [1] 0.140112
+
+```
+
+## En fin
+
+La integración de Monte Carlo no siempre tiene éxito: a veces la relación g(X)/f(X) varía tanto que la media muestral no converge. Intente elegir f(x) para que esta relación sea aproximadamenteconstante, y evitar situaciones en las que g(x)/f(x) pueda ser arbitrariamente grande.
