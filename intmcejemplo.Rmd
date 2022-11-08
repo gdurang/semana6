@@ -1,13 +1,11 @@
 ---
-title: "Ejemplo Integracion Monte Carlo"
+title: "Ejemplo Inte Monte Carlo"
 author: "Guillermo Durán González"
-date: "2022-11-05"
+date: "2022-11-08"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 # Ejemplo de Integración Monte Carlo
 
@@ -18,22 +16,28 @@ $$
 $$
 # Apliquemos el siguiente script:
 
-```{r remedy001}
+
+```r
 n <- 10000
 x <- runif(n)
 media<-mean(exp(-x))
 theta <- media*(1-0)
 print(theta)
 ```
+
+```
+## [1] 0.6345205
+```
 ## En la gráfica se puede notar en rojo la media:
 
-```{r remedy003}
 
+```r
 plot(x, exp(-x),xlab="x", ylab="e^(-x)", type="p",col="green", xlim=c(0,1))
 text(0.5,media-0.025, "Media", col="red") 
 abline(h=media, col="red")
-
 ```
+
+![](Ejemplo-Integración-Monte-Carlo_files/figure-latex/remedy003-1.pdf)<!-- --> 
 
 
 ## Notese que al resolver la integral obtenemos un valor similar:
@@ -51,7 +55,8 @@ $$
 $$
 Solución: Mediante Monte Carlo se encuentra el siguiente valor:
 
-```{r remedy002}
+
+```r
 n <- 10000
 x <- runif(n, min=2, max=4 )
 media<-mean(exp(-x))
@@ -60,7 +65,16 @@ plot(x, exp(-x),xlab="x", ylab="e^(-x)",col="green",
      xlim=c(2,4), ylim=c(0,theta+.1),type="p")
 text(3,media+0.05, "Media", col="red")
 abline(h=media, col="red")
+```
+
+![](Ejemplo-Integración-Monte-Carlo_files/figure-latex/remedy002-1.pdf)<!-- --> 
+
+```r
 print(theta)
+```
+
+```
+## [1] 0.1160732
 ```
 # Resolviendo la integral se obtiene:
 

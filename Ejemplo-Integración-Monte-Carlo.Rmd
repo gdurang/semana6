@@ -1,5 +1,5 @@
 ---
-title: "Ejemplo Integracion Monte Carlo"
+title: "Ejemplo Integración Monte Carlo"
 author: "Guillermo Durán González"
 date: "2022-11-05"
 output: pdf_document
